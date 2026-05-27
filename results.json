@@ -1,0 +1,105 @@
+[
+  {
+    "company": "NovaTech Solutions",
+    "signal_type": "interview_speed",
+    "source_url": "https://linkedin.com/posts/sarah-kim-chro-novatech-2024",
+    "matched_keywords": [
+      "time-to-hire",
+      "slow interview",
+      "losing top talent",
+      "overwhelmed",
+      "pipeline is dry",
+      "my team",
+      "we're",
+      "we have",
+      "we need",
+      "our pipeline"
+    ],
+    "signal_score": 79,
+    "detected_at": "2026-05-27T06:30:52.437329Z",
+    "reason": "Author identified as 'chro' (tier: tier_1) | Primary pain theme 'interview_speed' detected via: time-to-hire, slow interview, losing top talent | Also touches on: recruiter_overload, sourcing_pipeline | Strong personal ownership language found: 'my team' + 5 more | HIGH SIGNAL: Strong candidate for outreach."
+  },
+  {
+    "company": "Apex Logistics",
+    "signal_type": "sourcing_pipeline",
+    "source_url": "https://linkedin.com/posts/derek-walsh-head-of-recruiting-apex",
+    "matched_keywords": [
+      "understaffed",
+      "applicant quality",
+      "wrong candidates applying",
+      "job posting",
+      "our team",
+      "we're",
+      "we've",
+      "we need"
+    ],
+    "signal_score": 75,
+    "detected_at": "2026-05-27T06:30:52.445367Z",
+    "reason": "Author identified as 'head of recruiting' (tier: tier_1) | Primary pain theme 'recruiter_overload' detected via: understaffed | Also touches on: sourcing_pipeline | Strong personal ownership language found: 'our team' + 3 more | HIGH SIGNAL: Strong candidate for outreach."
+  },
+  {
+    "company": "Meridian Health Group",
+    "signal_type": "inconsistent_evaluation",
+    "source_url": "https://linkedin.com/posts/james-okafor-vp-talent-meridian-2024",
+    "matched_keywords": [
+      "no rubric",
+      "no scorecard",
+      "gut feel",
+      "not calibrated",
+      "bad hires",
+      "90 day attrition",
+      "we're",
+      "our hiring"
+    ],
+    "signal_score": 68,
+    "detected_at": "2026-05-27T06:30:52.438896Z",
+    "reason": "Author identified as 'vp of talent' (tier: tier_1) | Primary pain theme 'inconsistent_evaluation' detected via: no rubric, no scorecard, gut feel | Also touches on: quality_of_hire | Strong personal ownership language found: 'we're' + 1 more | MEDIUM SIGNAL: Worth monitoring; may need validation."
+  },
+  {
+    "company": "Crestwood Capital",
+    "signal_type": "recruiter_overload",
+    "source_url": "https://linkedin.com/posts/priya-sharma-ta-manager-crestwood",
+    "matched_keywords": [
+      "offer turnaround",
+      "bandwidth",
+      "team is stretched",
+      "stretched thin",
+      "candidate experience",
+      "lack of communication",
+      "glassdoor reviews",
+      "our team",
+      "we have",
+      "we've"
+    ],
+    "signal_score": 64,
+    "detected_at": "2026-05-27T06:30:52.440632Z",
+    "reason": "Author identified as 'talent acquisition manager' (tier: tier_2) | Primary pain theme 'interview_speed' detected via: offer turnaround | Also touches on: recruiter_overload, candidate_experience | Strong personal ownership language found: 'our team' + 4 more | MEDIUM SIGNAL: Worth monitoring; may need validation."
+  },
+  {
+    "company": "BreakPoint Analytics",
+    "signal_type": "sourcing_pipeline",
+    "source_url": "https://breakpointanalytics.substack.com/p/state-of-recruiting-2024",
+    "matched_keywords": [
+      "hiring velocity",
+      "quality of hire",
+      "sourcing strategy",
+      "talent scarcity"
+    ],
+    "signal_score": 1,
+    "detected_at": "2026-05-27T06:30:52.443677Z",
+    "reason": "Primary pain theme 'interview_speed' detected via: hiring velocity | Also touches on: quality_of_hire, sourcing_pipeline | Note: 18 analyst/observer phrase(s) detected (e.g. 'according to') -- score penalized accordingly | NOISE: Likely analyst/vendor commentary, not personal pain."
+  },
+  {
+    "company": "Global HR Insights",
+    "signal_type": "interview_speed",
+    "source_url": "https://www.globalhrinsights.com/blog/hiring-trends-2024",
+    "matched_keywords": [
+      "time-to-hire",
+      "recruiter burnout",
+      "evaluation criteria"
+    ],
+    "signal_score": 0,
+    "detected_at": "2026-05-27T06:30:52.442183Z",
+    "reason": "Primary pain theme 'interview_speed' detected via: time-to-hire | Also touches on: recruiter_overload, inconsistent_evaluation | Note: 15 analyst/observer phrase(s) detected (e.g. 'according to') -- score penalized accordingly | NOISE: Likely analyst/vendor commentary, not personal pain."
+  }
+]

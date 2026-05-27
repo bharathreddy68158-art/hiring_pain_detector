@@ -1,0 +1,8 @@
+# ── Web server ──────────────────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0   # ASGI server that runs FastAPI
+jinja2>=3.1.0               # HTML templating (same as Flask uses)
+python-multipart>=0.0.9     # Required for Form() — file/form uploads
+
+# ── Everything else is Python standard library ──────
+# re, json, argparse, datetime, os, sys, typing

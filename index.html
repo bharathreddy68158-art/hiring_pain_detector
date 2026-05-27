@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hiring Pain Detector</title>
+  <style>
+    /* ── Reset & Base ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .wrapper    { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-bottom: 1px solid #1e293b;
+      padding: 24px 0;
+      margin-bottom: 36px;
+    }
+    header .inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 14px; }
+    .logo { font-size: 28px; }
+    .header-text h1 { font-size: 22px; font-weight: 700; color: #f8fafc; letter-spacing: -0.3px; }
+    .header-text p  { font-size: 13px; color: #64748b; margin-top: 2px; }
+
+    /* ── Stat Cards ─────────────────────────────────────────── */
+    .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 32px; }
+    .stat-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 18px 16px;
+      text-align: center;
+    }
+    .stat-card .num  { font-size: 32px; font-weight: 700; line-height: 1; }
+    .stat-card .lbl  { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .6px; margin-top: 6px; }
+    .stat-card.total .num { color: #94a3b8; }
+    .stat-card.high  .num { color: #f87171; }
+    .stat-card.med   .num { color: #fbbf24; }
+    .stat-card.low   .num { color: #60a5fa; }
+    .stat-card.noise .num { color: #475569; }
+
+    /* ── Two-col grid ───────────────────────────────────────── */
+    .grid { display: grid; grid-template-columns: 400px 1fr; gap: 28px; align-items: start; }
+
+    /* ── Form Panel ─────────────────────────────────────────── */
+    .panel {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 24px;
+      position: sticky;
+      top: 24px;
+    }
+    .panel h2 { font-size: 15px; font-weight: 600; color: #f8fafc; margin-bottom: 18px; }
+
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+    .field input, .field textarea {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #e2e8f0;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color .2s;
+      outline: none;
+    }
+    .field input:focus, .field textarea:focus { border-color: #6366f1; }
+    .field textarea { resize: vertical; min-height: 160px; line-height: 1.55; }
+
+    .btn-analyze {
+      width: 100%;
+      padding: 12px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      margin-top: 4px;
+    }
+    .btn-analyze:hover { background: #4f46e5; }
+
+    .divider { border: none; border-top: 1px solid #334155; margin: 20px 0; }
+
+    .btn-clear {
+      width: 100%;
+      padding: 9px;
+      background: transparent;
+      color: #64748b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-clear:hover { color: #f87171; border-color: #f87171; }
+
+    .api-hint { font-size: 12px; color: #475569; margin-top: 16px; line-height: 1.6; }
+    .api-hint code { background: #0f172a; padding: 2px 6px; border-radius: 4px; font-size: 11px; color: #818cf8; }
+
+    /* ── Results Panel ──────────────────────────────────────── */
+    .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .results-header h2 { font-size: 15px; font-weight: 600; color: #f8fafc; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #475569; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ── Result Card ────────────────────────────────────────── */
+    .result-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+      transition: border-color .2s;
+    }
+    .result-card:hover { border-color: #475569; }
+
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .card-left { flex: 1; min-width: 0; }
+    .company-name { font-size: 16px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .source-url   { font-size: 12px; color: #475569; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Score badge */
+    .score-badge {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+      font-weight: 700; font-size: 20px; border: 3px solid;
+    }
+    .score-badge .score-label { font-size: 9px; text-transform: uppercase; letter-spacing: .5px; margin-top: 1px; }
+    .badge-high   { color: #f87171; border-color: #f87171; background: rgba(248,113,113,.08); }
+    .badge-medium { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,.08); }
+    .badge-low    { color: #60a5fa; border-color: #60a5fa; background: rgba(96,165,250,.08); }
+    .badge-noise  { color: #475569; border-color: #334155; background: rgba(71,85,105,.08); }
+
+    /* Chips row */
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+    .chip {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 500; border: 1px solid;
+    }
+    .chip-theme    { color: #818cf8; border-color: #312e81; background: rgba(99,102,241,.12); }
+    .chip-keyword  { color: #34d399; border-color: #064e3b; background: rgba(52,211,153,.08); }
+
+    /* Reason text */
+    .reason-text { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+
+    /* Breakdown accordion */
+    .breakdown-toggle {
+      background: none; border: none; color: #475569; font-size: 12px;
+      cursor: pointer; padding: 0; margin-top: 10px; display: flex; align-items: center; gap: 5px;
+    }
+    .breakdown-toggle:hover { color: #94a3b8; }
+    .breakdown-body {
+      display: none;
+      margin-top: 12px;
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 12px;
+    }
+    .breakdown-body.open { display: block; }
+    .bd-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1e293b; }
+    .bd-row:last-child { border: none; }
+    .bd-label { color: #64748b; }
+    .bd-val   { color: #e2e8f0; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .bd-val.neg { color: #f87171; }
+    .bd-val.pos { color: #34d399; }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      .grid  { grid-template-columns: 1fr; }
+      .panel { position: static; }
+    }
+    @media (max-width: 500px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="logo">🎯</div>
+    <div class="header-text">
+      <h1>Hiring Pain / Intent Detector</h1>
+      <p>Local NLP · No cloud APIs · Heuristic scoring · Python 3</p>
+    </div>
+  </div>
+</header>
+
+<div class="wrapper">
+
+  <!-- ── Stat Cards ── -->
+  <div class="stats">
+    <div class="stat-card total"> <div class="num">{{ stats.total }}</div>  <div class="lbl">Total Analyzed</div></div>
+    <div class="stat-card high">  <div class="num">{{ stats.high }}</div>   <div class="lbl">High Signal ≥75</div></div>
+    <div class="stat-card med">   <div class="num">{{ stats.medium }}</div> <div class="lbl">Medium 50–74</div></div>
+    <div class="stat-card low">   <div class="num">{{ stats.low }}</div>    <div class="lbl">Low 25–49</div></div>
+    <div class="stat-card noise"> <div class="num">{{ stats.noise }}</div>  <div class="lbl">Noise &lt;25</div></div>
+  </div>
+
+  <div class="grid">
+
+    <!-- ── LEFT: Input Form ── -->
+    <div class="panel">
+      <h2>Analyze New Text</h2>
+      <form action="/analyze" method="POST">
+        <div class="field">
+          <label>Company Name</label>
+          <input type="text" name="company" placeholder="e.g. Acme Corp" />
+        </div>
+        <div class="field">
+          <label>Source URL (optional)</label>
+          <input type="text" name="source_url" placeholder="https://linkedin.com/posts/..." />
+        </div>
+        <div class="field">
+          <label>Post / Transcript Text</label>
+          <textarea name="text" placeholder="Paste a LinkedIn post, blog excerpt, or podcast transcript here..."></textarea>
+        </div>
+        <button type="submit" class="btn-analyze">⚡ Detect Signal</button>
+      </form>
+
+      <hr class="divider"/>
+
+      <form action="/clear" method="POST">
+        <button type="submit" class="btn-clear">🗑 Clear all results</button>
+      </form>
+
+      <div class="api-hint">
+        <strong style="color:#64748b">JSON API also available:</strong><br/>
+        <code>POST /api/analyze</code> → send <code>{ "text": "...", "company": "..." }</code><br/>
+        <code>GET &nbsp;/api/results</code> → returns all records as JSON
+      </div>
+    </div>
+
+    <!-- ── RIGHT: Results ── -->
+    <div>
+      <div class="results-header">
+        <h2>Results <span style="color:#475569;font-weight:400">({{ results|length }})</span></h2>
+      </div>
+
+      {% if not results %}
+      <div class="empty-state">
+        <div class="icon">📭</div>
+        <p>No results yet. Paste some text in the form to get started.</p>
+      </div>
+      {% endif %}
+
+      {% for r in results %}
+        {% set score = r.signal_score %}
+        {% if score >= 75 %}
+          {% set badge_class = "badge-high" %}
+          {% set status = "HIGH" %}
+        {% elif score >= 50 %}
+          {% set badge_class = "badge-medium" %}
+          {% set status = "MED" %}
+        {% elif score >= 25 %}
+          {% set badge_class = "badge-low" %}
+          {% set status = "LOW" %}
+        {% else %}
+          {% set badge_class = "badge-noise" %}
+          {% set status = "NOISE" %}
+        {% endif %}
+
+        <div class="result-card">
+          <div class="card-top">
+            <div class="card-left">
+              <div class="company-name">{{ r.company }}</div>
+              {% if r.source_url %}
+              <div class="source-url">{{ r.source_url }}</div>
+              {% endif %}
+            </div>
+            <div class="score-badge {{ badge_class }}">
+              {{ score }}
+              <span class="score-label">{{ status }}</span>
+            </div>
+          </div>
+
+          <div class="chips">
+            <span class="chip chip-theme">{{ r.signal_type }}</span>
+            {% for kw in r.matched_keywords[:6] %}
+            <span class="chip chip-keyword">{{ kw }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="reason-text">{{ r.reason }}</div>
+
+          <!-- Score Breakdown Accordion -->
+          {% if r.breakdown %}
+          <button class="breakdown-toggle" onclick="toggleBreakdown(this)">
+            ▶ Score breakdown
+          </button>
+          <div class="breakdown-body">
+            <div class="bd-row"><span class="bd-label">Job Title</span>     <span class="bd-val pos">+{{ r.breakdown.title_score }}</span></div>
+            <div class="bd-row"><span class="bd-label">Pain Themes</span>   <span class="bd-val pos">+{{ r.breakdown.theme_score }}</span></div>
+            <div class="bd-row"><span class="bd-label">Ownership Lang</span><span class="bd-val pos">+{{ r.breakdown.ownership_score }}</span></div>
+            <div class="bd-row"><span class="bd-label">Urgency Bonus</span> <span class="bd-val pos">+{{ r.breakdown.urgency_score }}</span></div>
+            <div class="bd-row"><span class="bd-label">Noise Penalty</span> <span class="bd-val neg">{{ r.breakdown.noise_penalty }}</span></div>
+            <div class="bd-row"><span class="bd-label">Raw Score</span>     <span class="bd-val">{{ r.breakdown.raw_score }}</span></div>
+            <div class="bd-row"><span class="bd-label">Proximity ×</span>   <span class="bd-val">{{ "%.2f"|format(r.breakdown.proximity_multiplier) }}</span></div>
+            <div class="bd-row" style="border-top:1px solid #334155;margin-top:4px;padding-top:8px">
+              <span class="bd-label" style="color:#e2e8f0;font-weight:600">Final Score</span>
+              <span class="bd-val" style="font-size:15px">{{ r.breakdown.final_score }}</span>
+            </div>
+            <div style="margin-top:8px;color:#475569;font-size:11px;line-height:1.5">
+              {{ r.breakdown.proximity_detail }}
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+    </div>
+
+  </div><!-- /grid -->
+</div><!-- /wrapper -->
+
+<script>
+  function toggleBreakdown(btn) {
+    const body = btn.nextElementSibling;
+    body.classList.toggle('open');
+    btn.textContent = body.classList.contains('open')
+      ? '▼ Score breakdown'
+      : '▶ Score breakdown';
+  }
+</script>
+
+</body>
+</html>
